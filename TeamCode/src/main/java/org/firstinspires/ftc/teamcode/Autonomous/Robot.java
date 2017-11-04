@@ -58,7 +58,7 @@ public class Robot { //Does not implement anything as it is a separate class
     }
 
     //Methods to call
-    public void init(HardwareMap ahwMap) { //For initializing all of motors and servos
+    public void initRobot(HardwareMap ahwMap) { //For initializing all of motors and servos
         hwMap = ahwMap;
 
         //Here you map and initialize all of you devices. It is always better if you are doing something to one thing, to ensure that it is done to the others.
@@ -100,7 +100,8 @@ public class Robot { //Does not implement anything as it is a separate class
         green.setPosition(GREEN_RELEASE_POSITION);
     }
 
-    public void driveArcade(double drive, double turn) { //Takes a drive and turn value and converts it to motor values. Yes, you can have multiple methods that are named the same, as long as they take a different permutation of parameters
+    //Yes, you can have multiple methods that are named the same, as long as they take a different number/type of parameters
+    public void driveArcade(double drive, double turn) { //Takes a drive and turn value and converts it to motor values.
         leftMotor.setPower(Range.clip((drive + turn), -DRIVE_FULL_SPEED, DRIVE_FULL_SPEED));
         rightMotor.setPower(Range.clip((drive - turn), -DRIVE_FULL_SPEED, DRIVE_FULL_SPEED));
     }
@@ -137,5 +138,12 @@ public class Robot { //Does not implement anything as it is a separate class
                 green.setPosition(GREEN_GRIP_POSITION);
                 break;
         }
+    }
+
+    //Some methods for pushing data out of this 'black box'
+    public double getLiftPosition() {
+        //Do some math on getting the encoder positions
+        double liftValue = liftDrive.getCurrentPosition() + liftDriveTwo.getCurrentPosition();
+        return liftValue;
     }
 }
