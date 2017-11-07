@@ -1,18 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.teamcode.Autonomous.Robot;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOpTest")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp with Class")
 //@Disabled
-public class TeleOpTestRobot extends OpMode {
+public class TeleOpTestClass extends OpMode {
     // Declare OpMode members.
-    private Robot robot;
+    private Robot robot = new Robot();
 
     private boolean preY;
     private boolean toggleState;
@@ -61,11 +57,11 @@ public class TeleOpTestRobot extends OpMode {
 
         robot.driveArcade(-gamepad1.left_stick_y, gamepad1.right_stick_x, slowState);
 
-        double up = gamepad2.left_stick_y;
-        double up2 = gamepad2.right_stick_y;
+        double stageOneValue = -gamepad2.left_stick_y;
+        double stageTwoValue = gamepad2.right_stick_y;
 
-        robot.liftDrive.setPower(-up);
-        robot.liftDriveTwo.setPower(up2);
+        robot.liftStageOne.setPower(stageOneValue);
+        robot.liftStageTwo.setPower(stageTwoValue);
 
         if (currentY != preY) {
             if (currentY) {

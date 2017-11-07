@@ -11,13 +11,13 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 public class Robot { //Does not implement anything as it is a separate class
-    //Here you create objects of actuators and sensors on the robot. It is important that these are public so that other classes can access them as hardware
+    //Here you create objects of actuators and sensors on the robot. It is important that these are public if you want other classes to access them as DcMotors, Servos, or anything else
     //You can also use this to hold constant variables for servo positions, motor speeds, etc.
     public DcMotor leftMotor = null; //You have to initialize these as null here, or else you run the risk of gettign an error if the program never reaches init
     public DcMotor rightMotor = null;
 
-    public DcMotor liftDrive = null;
-    public DcMotor liftDriveTwo = null;
+    public DcMotor liftStageOne = null;
+    public DcMotor liftStageTwo = null;
 
     public Servo pink = null;
     public Servo blue = null;
@@ -69,12 +69,15 @@ public class Robot { //Does not implement anything as it is a separate class
         leftMotor.setDirection(DcMotor.Direction.FORWARD);
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
 
-        //Lift motors
-        liftDrive = hwMap.get(DcMotor.class, "LD");
-        liftDriveTwo = hwMap.get(DcMotor.class, "LDT");
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        liftDrive.setDirection(DcMotor.Direction.FORWARD);
-        liftDriveTwo.setDirection(DcMotor.Direction.FORWARD);
+        //Lift motors
+        liftStageOne = hwMap.get(DcMotor.class, "LD");
+        liftStageTwo = hwMap.get(DcMotor.class, "LDT");
+
+        liftStageOne.setDirection(DcMotor.Direction.FORWARD);
+        liftStageTwo.setDirection(DcMotor.Direction.FORWARD);
 
         //Servos
         pink = hwMap.get(Servo.class, "pink");
@@ -91,8 +94,8 @@ public class Robot { //Does not implement anything as it is a separate class
         leftMotor.setPower(DRIVE_FULL_STOP);
         rightMotor.setPower(DRIVE_FULL_STOP);
 
-        liftDrive.setPower(LIFT_FULL_STOP);
-        liftDriveTwo.setPower(LIFT_FULL_STOP);
+        liftStageOne.setPower(LIFT_FULL_STOP);
+        liftStageTwo.setPower(LIFT_FULL_STOP);
 
         pink.setPosition(PINK_RELEASE_POSITION);
         blue.setPosition(BLUE_RELEASE_POSITION);
@@ -143,7 +146,6 @@ public class Robot { //Does not implement anything as it is a separate class
     //Some methods for pushing data out of this 'black box'
     public double getLiftPosition() {
         //Do some math on getting the encoder positions
-        double liftValue = liftDrive.getCurrentPosition() + liftDriveTwo.getCurrentPosition();
-        return liftValue;
+        return liftStageOne.getCurrentPosition() + liftStageTwo.getCurrentPosition();
     }
 }
