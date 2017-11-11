@@ -86,6 +86,8 @@ public class TeleOpTestClass extends OpMode {
 
         robot.grip(gripperMode);
 
+        telemetry.addData("Color", robot.leftColorRed());
+
         preY = currentY;
         preX = currentX;
     }

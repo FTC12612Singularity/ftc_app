@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -23,6 +24,10 @@ public class Robot { //Does not implement anything as it is a separate class
     public Servo blue = null;
     public Servo orange = null;
     public Servo green = null;
+    public Servo leftJewelServo = null;
+    public Servo rightJewelServo = null;
+
+    public ColorSensor leftColorSensor = null;
 
     //Some constant variables
     public final double DRIVE_SLOW_SPEED_SCALE = 0.5; //Final means that the variable can only be assigned once, it remains a constant value throughout the time the program is run
@@ -33,6 +38,12 @@ public class Robot { //Does not implement anything as it is a separate class
 
     public final double LIFT_FULL_STOP = 0.0;
     public final double LIFT_FULL_SPEED = 1.0;
+
+    public final double LEFT_PUSH_POSITION = 1.0;
+    public final double LEFT_RELEASE_POSITION = 0.5;
+
+    public final double RIGHT_PUSH_POSITION = 1.0;
+    public final double RIGHT_RELEASE_POSITION = 0.5;
 
     public final double PINK_GRIP_POSITION = 0.5;
     public final double PINK_RELEASE_POSITION = 0.0;
@@ -84,13 +95,22 @@ public class Robot { //Does not implement anything as it is a separate class
         blue = hwMap.get(Servo.class, "blue");
         orange = hwMap.get(Servo.class, "orange");
         green = hwMap.get(Servo.class, "green");
+        leftJewelServo = hwMap.get(Servo.class, "LJS");
+        rightJewelServo = hwMap.get(Servo.class, "RJS");
 
         pink.setDirection(Servo.Direction.REVERSE);
         blue.setDirection(Servo.Direction.REVERSE);
         orange.setDirection(Servo.Direction.FORWARD);
         green.setDirection(Servo.Direction.FORWARD);
+        leftJewelServo.setDirection(Servo.Direction.FORWARD);
+        rightJewelServo.setDirection(Servo.Direction.REVERSE);
+
+        //Sensors
+        leftColorSensor = hwMap.get(ColorSensor.class, "SC");
 
         //Set home positions of all actuators
+        leftColorSensor.enableLed(true);
+
         leftMotor.setPower(DRIVE_FULL_STOP);
         rightMotor.setPower(DRIVE_FULL_STOP);
 
@@ -144,8 +164,12 @@ public class Robot { //Does not implement anything as it is a separate class
     }
 
     //Some methods for pushing data out of this 'black box'
-    public double getLiftPosition() {
+    public int getLiftPosition() {
         //Do some math on getting the encoder positions
         return liftStageOne.getCurrentPosition() + liftStageTwo.getCurrentPosition();
+    }
+
+    public boolean leftColorRed() {
+        return leftColorSensor.red() > leftColorSensor.blue() && leftColorSensor.red() > leftColorSensor.green();
     }
 }
