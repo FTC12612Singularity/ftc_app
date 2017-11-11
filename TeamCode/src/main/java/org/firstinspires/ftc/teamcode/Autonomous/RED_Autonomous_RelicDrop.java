@@ -10,6 +10,8 @@ public class RED_Autonomous_RelicDrop extends OpMode {
     private Robot robot = new Robot();
     private ElapsedTime elapsedTime = new ElapsedTime();
 
+    private boolean colorIsRed;
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -39,24 +41,29 @@ public class RED_Autonomous_RelicDrop extends OpMode {
      */
     @Override
     public void loop() {
-        if (elapsedTime.seconds() < 1.0) {
-            robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
-            telemetry.addData("Status", "Gripping");
-        } else if (elapsedTime.seconds() < 2.0) {
-            robot.driveArcade(0.5, 0);
-            telemetry.addData("Status", "Driving");
+        if (elapsedTime.seconds() < 0.5) {
+            robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
+        } else if (elapsedTime.seconds() < 1.5) {
+            colorIsRed = robot.leftColorRed();
+            if (colorIsRed) {
+                robot.driveArcade(-0.25, 0);
+            } else {
+                robot.driveArcade(0.25, 0);
+            }
+        } else if (elapsedTime.seconds() < 2) {
+            robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
+        } else if (elapsedTime.seconds() < 4) {
+            robot.driveArcade(0.25, 0);
         } else {
             robot.driveArcade(0.0, 0);
-            telemetry.addData("Status", "Done");
         }
-        telemetry.addData("Time", elapsedTime.seconds());
     }
 
     /*
      * Code to run ONCE after the driver hits STOP
      */
-    @Override
-    public void stop() {
+        @Override
+        public void stop () {
 
+        }
     }
-}

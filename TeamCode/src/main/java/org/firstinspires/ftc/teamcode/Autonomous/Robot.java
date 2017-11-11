@@ -117,6 +117,9 @@ public class Robot { //Does not implement anything as it is a separate class
         liftStageOne.setPower(LIFT_FULL_STOP);
         liftStageTwo.setPower(LIFT_FULL_STOP);
 
+        leftJewelServo.setPosition(LEFT_RELEASE_POSITION);
+        rightJewelServo.setPosition(RIGHT_RELEASE_POSITION);
+
         pink.setPosition(PINK_RELEASE_POSITION);
         blue.setPosition(BLUE_RELEASE_POSITION);
         orange.setPosition(ORANGE_RELEASE_POSITION);
