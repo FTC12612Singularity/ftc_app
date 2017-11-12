@@ -62,8 +62,8 @@ public class RED_Autonomous_RelicDrop extends OpMode {
     /*
      * Code to run ONCE after the driver hits STOP
      */
-        @Override
-        public void stop () {
+    @Override
+    public void stop() {
 
-        }
     }
+}

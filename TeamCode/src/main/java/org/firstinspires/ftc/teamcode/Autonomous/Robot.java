@@ -12,39 +12,17 @@ import com.qualcomm.robotcore.util.Range;
  */
 
 public class Robot { //Does not implement anything as it is a separate class
-    //Here you create objects of actuators and sensors on the robot. It is important that these are public if you want other classes to access them as DcMotors, Servos, or anything else
-    //You can also use this to hold constant variables for servo positions, motor speeds, etc.
-    public DcMotor leftMotor = null; //You have to initialize these as null here, or else you run the risk of gettign an error if the program never reaches init
-    public DcMotor rightMotor = null;
-
-    public DcMotor liftStageOne = null;
-    public DcMotor liftStageTwo = null;
-
-    public Servo pink = null;
-    public Servo blue = null;
-    public Servo orange = null;
-    public Servo green = null;
-    public Servo leftJewelServo = null;
-    public Servo rightJewelServo = null;
-
-    public ColorSensor leftColorSensor = null;
-
     //Some constant variables
     public final double DRIVE_SLOW_SPEED_SCALE = 0.5; //Final means that the variable can only be assigned once, it remains a constant value throughout the time the program is run
     public final double DRIVE_FULL_SPEED_SCALE = 1.0;
-
     public final double DRIVE_FULL_STOP = 0.0;
     public final double DRIVE_FULL_SPEED = 1.0;
-
     public final double LIFT_FULL_STOP = 0.0;
     public final double LIFT_FULL_SPEED = 1.0;
-
-    public final double LEFT_PUSH_POSITION = 1.0;
-    public final double LEFT_RELEASE_POSITION = 0.5;
-
-    public final double RIGHT_PUSH_POSITION = 1.0;
-    public final double RIGHT_RELEASE_POSITION = 0.5;
-
+    public final double LEFT_PUSH_POSITION = 0.75;
+    public final double LEFT_RELEASE_POSITION = 0;
+    public final double RIGHT_PUSH_POSITION = 0.75;
+    public final double RIGHT_RELEASE_POSITION = 0;
     public final double PINK_GRIP_POSITION = 0.5;
     public final double PINK_RELEASE_POSITION = 0.0;
     public final double BLUE_GRIP_POSITION = 0.5;
@@ -53,14 +31,19 @@ public class Robot { //Does not implement anything as it is a separate class
     public final double ORANGE_RELEASE_POSITION = 0.0;
     public final double GREEN_GRIP_POSITION = 0.5;
     public final double GREEN_RELEASE_POSITION = 1.0;
-
-    public enum GRIPPER_STATES {
-        GRIPPER_FULL_OPEN,
-        GRIPPER_FULL_GRIP,
-        GRIPPER_LEFT_ONLY,
-        GRIPPER_RIGHT_ONLY
-    }
-
+    //Here you create objects of actuators and sensors on the robot. It is important that these are public if you want other classes to access them as DcMotors, Servos, or anything else
+    //You can also use this to hold constant variables for servo positions, motor speeds, etc.
+    public DcMotor leftMotor = null; //You have to initialize these as null here, or else you run the risk of gettign an error if the program never reaches init
+    public DcMotor rightMotor = null;
+    public DcMotor liftStageOne = null;
+    public DcMotor liftStageTwo = null;
+    public Servo pink = null;
+    public Servo blue = null;
+    public Servo orange = null;
+    public Servo green = null;
+    public Servo leftJewelServo = null;
+    public Servo rightJewelServo = null;
+    public ColorSensor leftColorSensor = null;
     //Private objects that are needed for initialization
     private HardwareMap hwMap = null;
 
@@ -174,5 +157,12 @@ public class Robot { //Does not implement anything as it is a separate class
 
     public boolean leftColorRed() {
         return leftColorSensor.red() > leftColorSensor.blue() && leftColorSensor.red() > leftColorSensor.green();
+    }
+
+    public enum GRIPPER_STATES {
+        GRIPPER_FULL_OPEN,
+        GRIPPER_FULL_GRIP,
+        GRIPPER_LEFT_ONLY,
+        GRIPPER_RIGHT_ONLY
     }
 }
