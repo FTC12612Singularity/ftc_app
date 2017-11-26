@@ -86,6 +86,18 @@ public class TeleOpTestClass extends OpMode {
 
         robot.grip(gripperMode);
 
+        if(gamepad1.left_bumper) {
+            robot.leftJewelServo.setPosition(robot.LEFT_PUSH_POSITION);
+        } else {
+            robot.leftJewelServo.setPosition(robot.LEFT_RELEASE_POSITION);
+        }
+
+        if(gamepad1.right_bumper) {
+            robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
+        } else {
+            robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
+        }
+
         telemetry.addData("Color", robot.leftColorRed());
 
         preY = currentY;

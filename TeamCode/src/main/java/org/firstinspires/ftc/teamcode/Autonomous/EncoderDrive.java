@@ -50,29 +50,27 @@ public class EncoderDrive extends OpMode {
     public void loop() {
         switch (currentStep) {
             case 0:
-                if (elapsedTime.seconds() < 1.0) {
+                if (elapsedTime.seconds() < 1.5) {
                     robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
+                    robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
                     telemetry.addData("Status", "Gripping");
                 } else {
                     currentStep++;
                 }
                 break;
             case 1:
-                if (elapsedTime.seconds() < 1.5) {
-                    robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
-                } else if (elapsedTime.seconds() < 2.5) {
+                if (elapsedTime.seconds() < 1.75) {
                     colorIsRed = robot.leftColorRed();
-                    if (colorIsRed) {
-                        robot.driveArcade(-0.25, 0);
-                    } else {
-                        robot.driveArcade(0.25, 0);
-                    }
-                } else if (elapsedTime.seconds() < 3) {
-                    robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
-                } else if (((robot.leftMotor.getCurrentPosition() + robot.rightMotor.getCurrentPosition()) / 2 < 32 * COUNTS_PER_INCH)) {
-                    robot.driveArcade(0.25, 0);
-                } else {
+                    robot.driveArcade(0.15 * (colorIsRed ? -1 : 1), 0, true);
+                } else if (elapsedTime.seconds() < 7) {
                     robot.driveArcade(0, 0);
+                    robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
+                }/* else if (((robot.leftMotor.getCurrentPosition() + robot.rightMotor.getCurrentPosition()) / 2 < 32 * COUNTS_PER_INCH)) {
+                    robot.driveArcade(0.25, 0);
+                } else if (robot.leftMotor.getCurrentPosition() < (14 + 32) * COUNTS_PER_INCH) {
+                    robot.driveArcade(0, 0.5);
+                }*/ else {
+                   // robot.driveArcade(0, 0);
                     currentStep++;
                 }
                 break;

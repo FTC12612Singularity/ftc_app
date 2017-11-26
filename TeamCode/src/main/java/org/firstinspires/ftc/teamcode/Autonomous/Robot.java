@@ -19,9 +19,9 @@ public class Robot { //Does not implement anything as it is a separate class
     public final double DRIVE_FULL_SPEED = 1.0;
     public final double LIFT_FULL_STOP = 0.0;
     public final double LIFT_FULL_SPEED = 1.0;
-    public final double LEFT_PUSH_POSITION = 0.75;
+    public final double LEFT_PUSH_POSITION = 0.55;
     public final double LEFT_RELEASE_POSITION = 0;
-    public final double RIGHT_PUSH_POSITION = 0.75;
+    public final double RIGHT_PUSH_POSITION = 0.55;
     public final double RIGHT_RELEASE_POSITION = 0;
     public final double PINK_GRIP_POSITION = 0.5;
     public final double PINK_RELEASE_POSITION = 0.0;

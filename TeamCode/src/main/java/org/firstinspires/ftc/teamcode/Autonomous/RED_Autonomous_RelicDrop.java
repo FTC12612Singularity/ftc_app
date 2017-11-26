@@ -50,10 +50,11 @@ public class RED_Autonomous_RelicDrop extends OpMode {
             } else {
                 robot.driveArcade(0.25, 0);
             }
-        } else if (elapsedTime.seconds() < 2) {
+        } else if (elapsedTime.seconds() < 1.75){
             robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
-        } else if (elapsedTime.seconds() < 4) {
-            robot.driveArcade(0.25, 0);
+            robot.driveArcade(0.0,0);
+        //} else if (elapsedTime.seconds() < 4) {
+          //  robot.driveArcade(0.25, 0);
         } else {
             robot.driveArcade(0.0, 0);
         }
