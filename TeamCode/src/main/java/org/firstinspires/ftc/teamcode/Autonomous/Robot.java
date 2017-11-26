@@ -91,6 +91,8 @@ public class Robot { //Does not implement anything as it is a separate class
         //Sensors
         leftColorSensor = hwMap.get(ColorSensor.class, "SC");
 
+        //Reset
+
         //Set home positions of all actuators
         leftColorSensor.enableLed(true);
 
