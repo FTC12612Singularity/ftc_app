@@ -72,7 +72,7 @@ public class RED_Full_Auto extends OpMode {
         } else if (elapsedTime.seconds() < 8) {
             robot.driveArcade(0.25, 0);
         } else if (elapsedTime.seconds() < 9.5) {
-            robot.driveArcade(-0.25, 0 );
+            robot.driveArcade(-0.1, 0 );
         } else {
             robot.driveArcade(0, 0);
         }
