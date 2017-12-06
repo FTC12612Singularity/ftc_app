@@ -63,7 +63,7 @@ import java.util.List;
  * This example assumes a "diamond" field configuration where the red and blue alliance stations
  * are adjacent on the corner of the field furthest from the audience.
  * From the Audience perspective, the Red driver station is on the right.
- * The two vision target are located on the two walls closest to the audience, facing in.
+ * The two vision targets are located on the two walls closest to the audience, facing in.
  * The Stones are on the RED side of the field, and the Chips are on the Blue side.
  *
  * A final calculation then uses the location of the camera on the robot to determine the

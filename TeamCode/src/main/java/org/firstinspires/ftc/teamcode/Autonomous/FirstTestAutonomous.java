@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.Autonomous;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Autonomous")
-//@Disabled
+@Disabled
 public class FirstTestAutonomous extends OpMode {
     // Declare OpMode members.
     private Robot robot = new Robot();
@@ -49,7 +50,6 @@ public class FirstTestAutonomous extends OpMode {
             robot.driveArcade(0.0, 0);
             telemetry.addData("Status", "Done");
         }
-        telemetry.addData("Time", elapsedTime.seconds());
     }
 
     /*

@@ -21,8 +21,8 @@ public class Robot { //Does not implement anything as it is a separate class
     public final double LIFT_FULL_SPEED = 1.0;
     public final double LEFT_PUSH_POSITION = 0.55;
     public final double LEFT_RELEASE_POSITION = 0;
-    public final double RIGHT_PUSH_POSITION = 0.55;
-    public final double RIGHT_RELEASE_POSITION = 0;
+    public final double RIGHT_PUSH_POSITION = 0.8;
+    public final double RIGHT_RELEASE_POSITION = 0.3;
     public final double PINK_GRIP_POSITION = 0.5;
     public final double PINK_RELEASE_POSITION = 0.0;
     public final double BLUE_GRIP_POSITION = 0.5;
@@ -31,6 +31,11 @@ public class Robot { //Does not implement anything as it is a separate class
     public final double ORANGE_RELEASE_POSITION = 0.0;
     public final double GREEN_GRIP_POSITION = 0.5;
     public final double GREEN_RELEASE_POSITION = 1.0;
+
+    public static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: NeveRest 40
+    public static final double DRIVE_GEAR_REDUCTION = 1.0 / 3.0;     // This is < 1.0 if geared UP
+    public static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    public static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_INCHES * Math.PI);
     //Here you create objects of actuators and sensors on the robot. It is important that these are public if you want other classes to access them as DcMotors, Servos, or anything else
     //You can also use this to hold constant variables for servo positions, motor speeds, etc.
     public DcMotor leftMotor = null; //You have to initialize these as null here, or else you run the risk of gettign an error if the program never reaches init
@@ -65,6 +70,7 @@ public class Robot { //Does not implement anything as it is a separate class
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         //Lift motors
         liftStageOne = hwMap.get(DcMotor.class, "LD");
@@ -160,11 +166,23 @@ public class Robot { //Does not implement anything as it is a separate class
     public boolean leftColorRed() {
         return leftColorSensor.red() > leftColorSensor.blue() && leftColorSensor.red() > leftColorSensor.green();
     }
+    public boolean leftColorBlue() {
+        return leftColorSensor.blue() > leftColorSensor.red() && leftColorSensor.blue() > leftColorSensor.green();
+    }
 
     public enum GRIPPER_STATES {
         GRIPPER_FULL_OPEN,
         GRIPPER_FULL_GRIP,
         GRIPPER_LEFT_ONLY,
         GRIPPER_RIGHT_ONLY
+    }
+
+    public void methodTankDrive(double left, double right) {
+        leftMotor.setPower(left);
+        rightMotor.setPower(right);
+    }
+
+    public int convertTicksToInches(double inches) {
+        return  (int) (COUNTS_PER_INCH * inches);
     }
 }

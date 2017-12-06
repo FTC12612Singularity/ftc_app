@@ -4,7 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Autonomous.Robot;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp with Class")
+@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "TeleOp")
 //@Disabled
 public class TeleOpTestClass extends OpMode {
     // Declare OpMode members.
@@ -68,13 +68,12 @@ public class TeleOpTestClass extends OpMode {
                 toggleState = !toggleState;
             }
         }
-
         Robot.GRIPPER_STATES gripperMode;
         if (toggleState) {
             gripperMode = Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP;
         } else if (gamepad2.left_bumper || gamepad2.right_bumper) {
             if (gamepad2.left_bumper && gamepad2.right_bumper) {
-                gripperMode = Robot.GRIPPER_STATES.GRIPPER_FULL_OPEN;
+                gripperMode = Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP;
             } else if (gamepad2.left_bumper) {
                 gripperMode = Robot.GRIPPER_STATES.GRIPPER_LEFT_ONLY;
             } else {
@@ -83,6 +82,7 @@ public class TeleOpTestClass extends OpMode {
         } else {
             gripperMode = Robot.GRIPPER_STATES.GRIPPER_FULL_OPEN;
         }
+
 
         robot.grip(gripperMode);
 
