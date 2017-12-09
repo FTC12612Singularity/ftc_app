@@ -12,8 +12,8 @@ public class EncoderDrive extends OpMode {
     private ElapsedTime elapsedTime = new ElapsedTime();
 
     static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: NeveRest 40
-    static final double DRIVE_GEAR_REDUCTION = 1.0 / 3.0;     // This is < 1.0 if geared UP
-    static final double WHEEL_DIAMETER_INCHES = 4.0;     // For figuring circumference
+    static final double DRIVE_GEAR_REDUCTION = 1.0 / 3.0;
+    static final double WHEEL_DIAMETER_INCHES = 4.0;
     static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
             (WHEEL_DIAMETER_INCHES * Math.PI);
 
@@ -66,47 +66,33 @@ public class EncoderDrive extends OpMode {
                 } else if (elapsedTime.seconds() < 7) {
                     robot.driveArcade(0, 0);
                     robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
-                }/* else if (((robot.leftMotor.getCurrentPosition() + robot.rightMotor.getCurrentPosition()) / 2 < 32 * COUNTS_PER_INCH)) {
+                } else if (((robot.leftMotor.getCurrentPosition() + robot.rightMotor.getCurrentPosition()) / 2 < 32 * COUNTS_PER_INCH)) {
                     robot.driveArcade(0.25, 0);
                 } else if (robot.leftMotor.getCurrentPosition() < (14 + 32) * COUNTS_PER_INCH) {
                     robot.driveArcade(0, 0.5);
-                }*/ else {
-                   // robot.driveArcade(0, 0);
-                    currentStep++;
+
                 }
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
+                if (elapsedTime.seconds() < 1.0)
 
+                {
+                    robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
+                    telemetry.addData("Status", "Gripping");
+                } else if (elapsedTime.seconds() < 2.0)
+
+                {
+                    robot.driveArcade(0.5, 0);
+                    telemetry.addData("Status", "Driving");
+                } else
+
+                {
+                    robot.driveArcade(0.0, 0);
+                    telemetry.addData("Status", "Done");
+                }
+                telemetry.addData("Time", elapsedTime.seconds());
         }
-        if (elapsedTime.seconds() < 1.0)
-
-        {
-            robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
-            telemetry.addData("Status", "Gripping");
-        } else if (elapsedTime.seconds() < 2.0)
-
-        {
-            robot.driveArcade(0.5, 0);
-            telemetry.addData("Status", "Driving");
-        } else
-
-        {
-            robot.driveArcade(0.0, 0);
-            telemetry.addData("Status", "Done");
-        }
-        telemetry.addData("Time", elapsedTime.seconds());
-    }
 
     /*
      * Code to run ONCE after the driver hits STOP
      */
-    @Override
-    public void stop() {
-
     }
 }
