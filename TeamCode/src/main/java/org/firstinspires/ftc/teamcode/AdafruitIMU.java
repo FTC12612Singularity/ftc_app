@@ -5,7 +5,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -25,7 +25,7 @@ public class AdafruitIMU {
     // State used for updating telemetry
     private Orientation angles;
 
-    public AdafruitIMU(OpMode opmode, String configuredName) {
+    public AdafruitIMU(HardwareMap ahwMap, String configuredName) {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -37,11 +37,11 @@ public class AdafruitIMU {
         // Retrieve and initialize the IMU. We expect the IMU to be attached to an I2C port
         // on a Core Device Interface Module, configured to be a sensor of type "AdaFruit IMU",
         // and named "imu".
-        imu = opmode.hardwareMap.get(BNO055IMU.class, configuredName);
+        imu = ahwMap.get(BNO055IMU.class, configuredName);
         imu.initialize(parameters);
     }
 
-    public void startIMU() {
+    public void startIMU() { //Run in start
         imu.startAccelerationIntegration(new Position(), new Velocity(), 1000);
     }
 
