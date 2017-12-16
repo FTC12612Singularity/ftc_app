@@ -16,6 +16,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Autonomous.Navigation.navigationPID;
 
 import static com.sun.tools.javac.util.Constants.format;
 
@@ -25,6 +26,7 @@ public class IterativeVuforia extends OpMode {
     // Declare OpMode members.
     private Robot robot = new Robot();
     private ElapsedTime elapsedTime = new ElapsedTime();
+    private navigationPID testNavigator;
 
     private OpenGLMatrix lastLocation = null;
 
@@ -32,8 +34,25 @@ public class IterativeVuforia extends OpMode {
 
     private VuforiaTrackables relicTrackables = null;
     private VuforiaTrackable relicTemplate = null;
+    private int encoderPositonReference;
 
-    private int stepCase = 0;
+    private boolean colorIsRed;
+
+    double[][] movementArray = new double[][]{
+            {1, 0.25, 6},
+            {6, 0, 0},
+            {3, 0.25, -45},
+            {2, -0.25, -2},
+
+            {3, 0.25, -90},
+            {1, 0.25, 3},
+            {5, 0, 0}
+
+    };
+
+    private int mainProgramStep = 0;
+
+    private RelicRecoveryVuMark vuMark;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -52,6 +71,12 @@ public class IterativeVuforia extends OpMode {
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+
+        testNavigator = new navigationPID(movementArray, hardwareMap, "Aimu", robot.leftMotor, robot.rightMotor, (int) (robot.COUNTS_PER_MOTOR_REV * robot.DRIVE_GEAR_REDUCTION), 4);
+        testNavigator.tuneGains(0.04, 0.00004, 0);
+
+        telemetry.addData("Status", "Tuning done");
+
     }
 
     /*
@@ -80,57 +105,83 @@ public class IterativeVuforia extends OpMode {
      */
     @Override
     public void loop() {
-
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-        if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-
-                /* Found an instance of the template. In the actual game, you will probably
-                 * loop until this condition occurs, then move on to act accordingly depending
-                 * on which VuMark was visible. */
-            telemetry.addData("VuMark", "%s visible", vuMark);
-
-                /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
-                 * it is perhaps unlikely that you will actually need to act on this pose information, but
-                 * we illustrate it nevertheless, for completeness. */
-            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
-            telemetry.addData("Pose", format(pose));
-
-                /* We further illustrate how to decompose the pose into useful rotational and
-                 * translational components */
-            if (pose != null) {
-                VectorF trans = pose.getTranslation();
-                Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-
-                // Extract the X, Y, and Z components of the offset of the target relative to the robot
-                double tX = trans.get(0);
-                double tY = trans.get(1);
-                double tZ = trans.get(2);
-
-                // Extract the rotational components of the target relative to the robot
-                double rX = rot.firstAngle;
-                double rY = rot.secondAngle;
-                double rZ = rot.thirdAngle;
-            }
-        } else {
-            telemetry.addData("VuMark", "not visible");
-        }
-
-        switch (vuMark) {
-            case UNKNOWN:
-                telemetry.addData("Case", "Unknown");
+        switch (mainProgramStep) {
+            case 0:
+                if (elapsedTime.seconds() < 0.5) {
+                    robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
+                    robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
+                } else if (elapsedTime.seconds() < 4.5) {
+                    colorIsRed = robot.leftColorRed();
+                    if (colorIsRed) {
+                        testNavigator.moveWithAngle(0, -15);
+                    } else {
+                        testNavigator.moveWithAngle(0, 15);
+                    }
+                } else if (elapsedTime.seconds() < 8.5) {
+                    robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
+                } else {
+                    testNavigator.moveWithAngle(0, 0);
+                    mainProgramStep++;
+                }
                 break;
-            case LEFT:
-
-                telemetry.addData("Case", "Left");
+            case 1:
+                if (testNavigator.navigationType() == 6) {
+                    vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                    encoderPositonReference = robot.leftMotor.getCurrentPosition();
+                    mainProgramStep++;
+                } else {
+                    testNavigator.loopNavigation();
+                }
                 break;
-            case RIGHT:
-                telemetry.addData("Case", "Right");
+            case 2:
+                switch (vuMark) {
+                    case UNKNOWN:
+                        if (elapsedTime.seconds() > 4) {//Do whatever you want to do until you have reached 'false'
+                            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                                break;
+                            } else {
+                                mainProgramStep++;
+                            }
+                        } else {
+                            vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                        }
+                        telemetry.addData("Case", "Unknown");
+                        break;
+                    case LEFT:
+                        if (robot.leftMotor.getCurrentPosition() > testNavigator.convertInchesToEncoderTicks(30) + encoderPositonReference) {
+                            testNavigator.moveNoStop(0);
+                            mainProgramStep++;
+                            testNavigator.forceNextMovement();
+                        } else {
+                            testNavigator.moveNoStop(0.3);
+                        }
+                        telemetry.addData("Case", "Left");
+                        break;
+                    case RIGHT:
+                        if (robot.leftMotor.getCurrentPosition() > testNavigator.convertInchesToEncoderTicks(14) + encoderPositonReference) {
+                            testNavigator.moveNoStop(0);
+                            mainProgramStep++;
+                            testNavigator.forceNextMovement();
+                        } else {
+                            testNavigator.moveNoStop(0.3);
+                        }
+                        telemetry.addData("Case", "Right");
+                        break;
+                    case CENTER:
+                        if (robot.leftMotor.getCurrentPosition() > testNavigator.convertInchesToEncoderTicks(22) + encoderPositonReference) {
+                            testNavigator.moveNoStop(0);
+                            mainProgramStep++;
+                            testNavigator.forceNextMovement();
+                        } else {
+                            testNavigator.moveNoStop(0.3);
+                        }
+                        telemetry.addData("Case", "Center");
+                        break;
+                }
                 break;
-            case CENTER:
-                telemetry.addData("Case", "Center");
+            case 3:
+                testNavigator.loopNavigation();
                 break;
-
-
         }
     }
 

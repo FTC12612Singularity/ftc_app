@@ -54,7 +54,6 @@ public class Red_Relic_Drop_With_Navigation extends OpMode {
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
-        robot.initRobot(hardwareMap);
         testNavigator = new navigationPID(movementArray, hardwareMap, "Aimu", robot.leftMotor, robot.rightMotor, (int) (robot.COUNTS_PER_MOTOR_REV * robot.DRIVE_GEAR_REDUCTION), 4);
         testNavigator.tuneGains(0.04, 0.00004, 0);
 
@@ -89,57 +88,54 @@ public class Red_Relic_Drop_With_Navigation extends OpMode {
 
     @Override
     public void loop() {
-        if (internalUpdateTelemetryNow("Status", "Tuning Done")) {
-            movementArray.
-            switch (mainProgramStep) {
-                case 0:
-                    ;
-                    if (testNavigator.navigationType() == 6) {
-                        vuMark = RelicRecoveryVuMark.from(relicTemplate);
-                        mainProgramStep++;
-                    } else {
-                        testNavigator.loopNavigation();
-                    }
-                    break;
-                case 1: //Move forwards depending on VuMark detected
-                    switch (vuMark) {
-                        case UNKNOWN:
-                            if (false) {//Do whatever you want to do until you have reached 'false' (
-                            } else {
-
-                            }
-                            telemetry.addData("Case", "Unknown");
-                            break;
-                        case LEFT:
-                            telemetry.addData("Case", "Left");
-                            break;
-                        case RIGHT:
-                            telemetry.addData("Case", "Right");
-                            break;
-                        case CENTER:
-                            // robot.movementArray;
-                            telemetry.addData("Case", "Center");
-                            break;
-                    }
-                    break;
-                case 2:
+        switch (mainProgramStep) {
+            case 0:
+                if (testNavigator.navigationType() == 6) {
+                    vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                    mainProgramStep++;
+                } else {
                     testNavigator.loopNavigation();
-                    break;
-            }
+                }
+                break;
+            case 1: //Move forwards depending on VuMark detected
+                switch (vuMark) {
+                    case UNKNOWN:
+                        if (false) {//Do whatever you want to do until you have reached 'false' (
+                        } else {
 
-            //telemetry.addData("Current navigation step", testNavigator.mainProgramStep;
-            telemetry.addData("Current navigation type", testNavigator.navigationType());
-            telemetry.addData("Current Adafruit Heading", testNavigator.currentHeading());
-            telemetry.addData("Left", robot.leftMotor.getCurrentPosition());
-            telemetry.addData("Right", robot.rightMotor.getCurrentPosition());
-
-
+                        }
+                        telemetry.addData("Case", "Unknown");
+                        break;
+                    case LEFT:
+                        telemetry.addData("Case", "Left");
+                        break;
+                    case RIGHT:
+                        telemetry.addData("Case", "Right");
+                        break;
+                    case CENTER:
+                        // robot.movementArray;
+                        telemetry.addData("Case", "Center");
+                        break;
+                }
+                break;
+            case 2:
+                testNavigator.loopNavigation();
+                break;
         }
+
+        //telemetry.addData("Current navigation step", testNavigator.mainProgramStep;
+        telemetry.addData("Current navigation type", testNavigator.navigationType());
+        telemetry.addData("Current Adafruit Heading", testNavigator.currentHeading());
+        telemetry.addData("Left", robot.leftMotor.getCurrentPosition());
+        telemetry.addData("Right", robot.rightMotor.getCurrentPosition());
+
+
     }
 
     private boolean internalUpdateTelemetryNow(String status, String s) {
         return internalUpdateTelemetryNow("Status", "Tuning Done");
     }
+
     @Override
     public void stop() {
 

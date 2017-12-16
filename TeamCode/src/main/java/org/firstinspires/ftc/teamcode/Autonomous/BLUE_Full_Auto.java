@@ -78,22 +78,7 @@ public class BLUE_Full_Auto extends OpMode {
             robot.driveArcade(0, 0);
         }
 
-       /* } else if (robot.rightMotor.getCurrentPosition() < referenceEncoderPosition + robot.convertTicksToInches(17)) {
-            robot.driveArcade(0.5, 0);
-            telemetry.addData("status", "driving");
-            //referenceEncoderPosition = robot.rightMotor.getCurrentPosition();
-        } else if (moveOn) {
-            referenceEncoderPosition = robot.rightMotor.getCurrentPosition();
-            moveOn = true;
-       // } else if (robot.rightMotor.getCurrentPosition() < referenceEncoderPosition - robot.convertTicksToInches(7)) {
-          //  robot.methodTankDrive(.4, -.4);
-          //  telemetry.addData("status", "turning");
-        } else {
-            robot.driveArcade(0.0, 0);
-        }
-        telemetry.addData("encoder", robot.rightMotor.getCurrentPosition());// + ", " + referenceEncoderPosition);
 
-        telemetry.addData("liftTest", robot.liftStageTwo.getCurrentPosition());// + ", " + referenceEncoderPosition);*/
 
 
     }

@@ -11,15 +11,14 @@ import org.firstinspires.ftc.teamcode.AdafruitIMU;
 public class navigationPID {
     private AdafruitIMU AdafruitGyro; //Instance of AdafruitIMU
     private double yawAngle;  //Array to store IMU's output
+    public double offsetYaw;
 
     private DcMotor leftMotor; //Instance of DcMotor
     private DcMotor rightMotor; //Instance of DcMotor
 
     private int movementArrayStep = 0;
 
-    double[][] movementArray = new double[][]{
-            {1, .25, 5}
-    };
+    double[][] movementArray;
 
     //Variables for PID loop
     private double setPoint = 0;
@@ -62,7 +61,7 @@ public class navigationPID {
     }
 
     public void loopNavigation() {
-        yawAngle = AdafruitGyro.getYaw();
+        yawAngle = AdafruitGyro.getYaw() + offsetYaw;
 
         move((int) movementArray[movementArrayStep][0], movementArray[movementArrayStep][1], movementArray[movementArrayStep][2]);
     }
@@ -81,6 +80,10 @@ public class navigationPID {
 
     public void forceNextMovement() {
         movementArrayStep++;
+    }
+
+    public double convertInchesToEncoderTicks(double inches) {
+        return encoderTicksPerInch * inches;
     }
 
     //**********Private methods**********
@@ -134,11 +137,20 @@ public class navigationPID {
             nextMovement();
         }
     }
+
     public void moveNoStop(double TpForwards) {
 
-        yawAngle = AdafruitGyro.getYaw();
+        yawAngle = AdafruitGyro.getYaw() + offsetYaw;
 
-        loopPID(TpForwards);}
+        loopPID(TpForwards);
+    }
+
+    public void moveWithAngle(double Tp, double angle) {
+        setPoint = angle;
+        yawAngle = AdafruitGyro.getYaw() + offsetYaw;
+
+        loopPID(Tp);
+    }
 
 
     private void rotateCCW(double goalAngle, double Tp) { //Movement val == 4
@@ -150,16 +162,13 @@ public class navigationPID {
         }
     }
 
-    private double convertInchesToEncoderTicks(double inches) {
-        return encoderTicksPerInch * inches;
-    }
-
     private void nextMovement() {
         leftMotor.setPower(0);
         rightMotor.setPower(0);
         encoderPositionReference = leftMotor.getCurrentPosition();
         movementArrayStep++;
     }
+
 
     private void loopPID(double Tp) {
         double error = yawAngle - setPoint;
