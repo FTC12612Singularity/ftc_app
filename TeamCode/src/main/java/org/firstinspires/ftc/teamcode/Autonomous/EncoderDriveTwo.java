@@ -1,69 +1,48 @@
 
 package org.firstinspires.ftc.teamcode.Autonomous;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "TestEncoder")
+//@Disabled
+public class EncoderDriveTwo extends OpMode {
+    // Declare OpMode members.
+    private Robot robot = new Robot();
+    private ElapsedTime elapsedTime = new ElapsedTime();
 
+    static final double COUNTS_PER_MOTOR_REV = 1120;    // eg: NeveRest 40
+    static final double DRIVE_GEAR_REDUCTION = 1.0 / 3.0;
+    static final double WHEEL_DIAMETER_INCHES = 4.0;
+    static final double COUNTS_PER_INCH = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * Math.PI);
 
-@Autonomous(name="EncoderDriveTwo", group="Iterative Opmode")
-@Disabled
-public class EncoderDriveTwo extends OpMode
-{
-
-    DcMotor leftmotor = null;
-    DcMotor rightmotor = null;
-
+    private int currentStep;
+    private boolean colorIsRed;
 
     /*
      * Code to run ONCE when the driver hits INIT
      */
-
-    public void main() throws InterruptedException {
-        leftmotor = hardwareMap.dcMotor.get("LM");
-        rightmotor = hardwareMap.dcMotor.get("RM");
-
-
-        leftmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-        rightmotor.setMode(DcMotor.RunMode.RUN_USING_ENCODERS);
-
-
-        waitForStart();
-
-        leftmotor.getCurrentPosition();
-        leftmotor.setTargetPosition(0);
-        leftmotor.isBusy();
-    }
-
-
-
-    private void waitForStart() {
-    }
-
     @Override
     public void init() {
-
+        robot.initRobot(hardwareMap);
     }
 
     /*
-         * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-         */
+     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+     */
     @Override
     public void init_loop() {
-    }
-
     /*
      * Code to run ONCE when the driver hits PLAY
      */
+
+}
+
     @Override
     public void start() {
-
+        elapsedTime.reset();
     }
 
     /*
@@ -71,14 +50,12 @@ public class EncoderDriveTwo extends OpMode
      */
     @Override
     public void loop() {
+        telemetry.addData("Encoder Left", robot.rightMotor.getCurrentPosition());
+        telemetry.addData("Encoder Right", robot.leftMotor.getCurrentPosition());
 
-    }
+        }
 
     /*
      * Code to run ONCE after the driver hits STOP
      */
-    @Override
-    public void stop() {
     }
-
-}

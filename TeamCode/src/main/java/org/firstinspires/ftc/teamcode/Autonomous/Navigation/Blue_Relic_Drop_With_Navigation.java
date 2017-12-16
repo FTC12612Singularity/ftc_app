@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Autonomous;
+package org.firstinspires.ftc.teamcode.Autonomous.Navigation;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -11,18 +11,16 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+import org.firstinspires.ftc.teamcode.Autonomous.Robot;
 
-import static com.sun.tools.javac.util.Constants.format;
-
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia Iterative")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "BlueRelicArrayTest")
 //@Disabled
-public class IterativeVuforia extends OpMode {
-    // Declare OpMode members.
+public class Blue_Relic_Drop_With_Navigation extends OpMode {
+    navigationPID testNavigator;
     private Robot robot = new Robot();
     private ElapsedTime elapsedTime = new ElapsedTime();
 
@@ -33,11 +31,21 @@ public class IterativeVuforia extends OpMode {
     private VuforiaTrackables relicTrackables = null;
     private VuforiaTrackable relicTemplate = null;
 
-    private int stepCase = 0;
+    private int mainProgramStep = 0;
+    private RelicRecoveryVuMark vuMark;
 
-    /*
-     * Code to run ONCE when the driver hits INIT
-     */
+
+    double[][] movementArray = new double[][]{
+
+            {2, -0.25, -31},
+            {3, 0.25, -45},
+            {2, -0.25, -6},
+            {3, 0.25, -90},
+            {1, 0.25, 9},
+            {5, 0, 0}
+
+    };
+
     @Override
     public void init() {
         robot.initRobot(hardwareMap);
@@ -52,6 +60,12 @@ public class IterativeVuforia extends OpMode {
         relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
         relicTemplate = relicTrackables.get(0);
         relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+        robot.initRobot(hardwareMap);
+        testNavigator = new navigationPID(movementArray, hardwareMap, "Aimu", robot.leftMotor, robot.rightMotor, (int) (robot.COUNTS_PER_MOTOR_REV * robot.DRIVE_GEAR_REDUCTION), 4);
+        testNavigator.tuneGains(0.04, 0.00004, 0);
+
+        telemetry.addData("Status", "Tuning done");
+
     }
 
     /*
@@ -69,79 +83,65 @@ public class IterativeVuforia extends OpMode {
     public void start() {
         elapsedTime.reset();
         relicTrackables.activate();
+
     }
 
     String format(OpenGLMatrix transformationMatrix) {
         return (transformationMatrix != null) ? transformationMatrix.formatAsTransform() : "null";
-    }
-
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
+    }
     @Override
     public void loop() {
+        switch (mainProgramStep){
+            case 0: ;
+                if (testNavigator.navigationType() == 6) {
+                    vuMark = RelicRecoveryVuMark.from(relicTemplate);
+                    mainProgramStep++;
+                } else {
+                    testNavigator.loopNavigation();
+                }
+                break;
+            case 1: //Move forwards depending on VuMark detected
+                switch (vuMark) {
+                    case UNKNOWN:
+                        if (false) {//Do whatever you want to do until you have reached 'false' (
+                        } else {
 
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-        if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-
-                /* Found an instance of the template. In the actual game, you will probably
-                 * loop until this condition occurs, then move on to act accordingly depending
-                 * on which VuMark was visible. */
-            telemetry.addData("VuMark", "%s visible", vuMark);
-
-                /* For fun, we also exhibit the navigational pose. In the Relic Recovery game,
-                 * it is perhaps unlikely that you will actually need to act on this pose information, but
-                 * we illustrate it nevertheless, for completeness. */
-            OpenGLMatrix pose = ((VuforiaTrackableDefaultListener) relicTemplate.getListener()).getPose();
-            telemetry.addData("Pose", format(pose));
-
-                /* We further illustrate how to decompose the pose into useful rotational and
-                 * translational components */
-            if (pose != null) {
-                VectorF trans = pose.getTranslation();
-                Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
-
-                // Extract the X, Y, and Z components of the offset of the target relative to the robot
-                double tX = trans.get(0);
-                double tY = trans.get(1);
-                double tZ = trans.get(2);
-
-                // Extract the rotational components of the target relative to the robot
-                double rX = rot.firstAngle;
-                double rY = rot.secondAngle;
-                double rZ = rot.thirdAngle;
-            }
-        } else {
-            telemetry.addData("VuMark", "not visible");
+                        }
+                        telemetry.addData("Case", "Unknown");
+                        break;
+                    case LEFT:
+                        telemetry.addData("Case", "Left");
+                        break;
+                    case RIGHT:
+                        telemetry.addData("Case", "Right");
+                        break;
+                    case CENTER:
+                        // robot.movementArray;
+                        telemetry.addData("Case", "Center");
+                        break;
+                }
+                break;
+            case 2:
+                testNavigator.loopNavigation();
+                break;
         }
 
-        switch (vuMark) {
-            case UNKNOWN:
-                telemetry.addData("Case", "Unknown");
-                break;
-            case LEFT:
-
-                telemetry.addData("Case", "Left");
-                break;
-            case RIGHT:
-                telemetry.addData("Case", "Right");
-                break;
-            case CENTER:
-                telemetry.addData("Case", "Center");
-                break;
+        //telemetry.addData("Current navigation step", testNavigator.mainProgramStep;
+        telemetry.addData("Current navigation type", testNavigator.navigationType());
+        telemetry.addData("Current Adafruit Heading", testNavigator.currentHeading());
+        telemetry.addData("Left", robot.leftMotor.getCurrentPosition());
+        telemetry.addData("Right", robot.rightMotor.getCurrentPosition());
 
 
-        }
+
     }
 
-
-    /*
-     * Code to run ONCE after the driver hits STOP
-     */
     @Override
     public void stop() {
 
+
     }
 }
-
-

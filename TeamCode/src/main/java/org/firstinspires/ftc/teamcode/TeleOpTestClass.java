@@ -16,6 +16,9 @@ public class TeleOpTestClass extends OpMode {
     private boolean preX;
     private boolean slowState;
 
+    private int stageOneLimit = 300;
+    private int stageTwoLimit = 300;
+
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -60,8 +63,32 @@ public class TeleOpTestClass extends OpMode {
         double stageOneValue = -gamepad2.left_stick_y;
         double stageTwoValue = gamepad2.right_stick_y;
 
+        /*if (robot.liftStageOne.getCurrentPosition() < stageTwoLimit && stageOneValue < 0.0) {
+            robot.liftStageOne.setPower(stageOneValue);
+        } else if (robot.liftStageOne.getCurrentPosition() > stageTwoLimit && stageOneValue > 0.0) {
+            robot.liftStageOne.setPower(stageOneValue);
+            if (stageOneValue < 0) {
+                robot.liftStageOne.setPower(stageOneValue);
+            } else {
+                robot.liftStageOne.setPower(0);
+            }
+
+        }
+
+        if (robot.liftStageTwo.getCurrentPosition() < stageOneLimit && stageTwoValue < 0.0) {
+            robot.liftStageTwo.setPower(stageTwoValue);
+        } else if (robot.liftStageTwo.getCurrentPosition() > stageOneLimit && stageTwoValue > 0.0) {
+            robot.liftStageTwo.setPower(stageTwoValue);
+            if (stageTwoValue < 0) {
+                robot.liftStageTwo.setPower(stageTwoValue);
+            } else {
+                robot.liftStageTwo.setPower(0);
+            }
+
+        }*/
         robot.liftStageOne.setPower(stageOneValue);
         robot.liftStageTwo.setPower(stageTwoValue);
+
 
         if (currentY != preY) {
             if (currentY) {
@@ -86,13 +113,13 @@ public class TeleOpTestClass extends OpMode {
 
         robot.grip(gripperMode);
 
-        if(gamepad1.left_bumper) {
+        if (gamepad1.left_bumper) {
             robot.leftJewelServo.setPosition(robot.LEFT_PUSH_POSITION);
         } else {
             robot.leftJewelServo.setPosition(robot.LEFT_RELEASE_POSITION);
         }
 
-        if(gamepad1.right_bumper) {
+        if (gamepad1.right_bumper) {
             robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
         } else {
             robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
@@ -102,6 +129,9 @@ public class TeleOpTestClass extends OpMode {
 
         preY = currentY;
         preX = currentX;
+        telemetry.addData("EncoderLeft", robot.leftMotor.getCurrentPosition());
+        telemetry.addData("EncoderRight", robot.rightMotor.getCurrentPosition());
+
     }
 
     /*

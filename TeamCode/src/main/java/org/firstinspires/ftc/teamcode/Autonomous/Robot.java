@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.Range;
 
 public class Robot { //Does not implement anything as it is a separate class
     //Some constant variables
-    public final double DRIVE_SLOW_SPEED_SCALE = 0.5; //Final means that the variable can only be assigned once, it remains a constant value throughout the time the program is run
+    public final double DRIVE_SLOW_SPEED_SCALE = 0.7; //Final means that the variable can only be assigned once, it remains a constant value throughout the time the program is run
     public final double DRIVE_FULL_SPEED_SCALE = 1.0;
     public final double DRIVE_FULL_STOP = 0.0;
     public final double DRIVE_FULL_SPEED = 1.0;
@@ -67,6 +67,10 @@ public class Robot { //Does not implement anything as it is a separate class
 
         leftMotor.setDirection(DcMotor.Direction.FORWARD);
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
+
+        leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
