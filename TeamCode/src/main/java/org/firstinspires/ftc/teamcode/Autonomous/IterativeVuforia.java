@@ -5,39 +5,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
-import org.firstinspires.ftc.robotcore.external.navigation.VuMarkInstanceId;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
-import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.teamcode.Autonomous.Navigation.navigationPID;
-
-import static com.sun.tools.javac.util.Constants.format;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Vuforia Iterative")
 //@Disabled
 public class IterativeVuforia extends OpMode {
-    // Declare OpMode members.
-    private Robot robot = new Robot();
-    private ElapsedTime elapsedTime = new ElapsedTime();
-    private navigationPID testNavigator;
-
-    private OpenGLMatrix lastLocation = null;
-
-    private VuforiaLocalizer vuforia;
-
-    private VuforiaTrackables relicTrackables = null;
-    private VuforiaTrackable relicTemplate = null;
-    private int encoderPositonReference;
-
-    private boolean colorIsRed;
-
     double[][] movementArray = new double[][]{
             {1, 0.25, 6},
             {6, 0, 0},
@@ -49,8 +25,19 @@ public class IterativeVuforia extends OpMode {
             {5, 0, 0}
 
     };
-
+    // Declare OpMode members.
+    private Robot robot = new Robot();
+    private ElapsedTime elapsedTime = new ElapsedTime();
+    private navigationPID testNavigator;
+    private OpenGLMatrix lastLocation = null;
+    private VuforiaLocalizer vuforia;
+    private VuforiaTrackables relicTrackables = null;
+    private VuforiaTrackable relicTemplate = null;
+    private int encoderPositonReference;
+    private boolean colorIsRed;
     private int mainProgramStep = 0;
+    private int knockJewelStep = 0;
+    private int driveJewelStep = 0;
 
     private RelicRecoveryVuMark vuMark;
 
@@ -107,27 +94,65 @@ public class IterativeVuforia extends OpMode {
     public void loop() {
         switch (mainProgramStep) {
             case 0:
-                if (elapsedTime.seconds() < 0.5) {
-                    robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
-                    robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
-                } else if (elapsedTime.seconds() < 4.5) {
-                    colorIsRed = robot.leftColorRed();
-                    if (colorIsRed) {
-                        testNavigator.moveWithAngle(0, -15);
-                    } else {
-                        testNavigator.moveWithAngle(0, 15);
-                    }
-                } else if (elapsedTime.seconds() < 8.5) {
-                    robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
-                } else {
-                    testNavigator.moveWithAngle(0, 0);
-                    mainProgramStep++;
+                switch (knockJewelStep) {
+                    case 0: //Close block gripper and lower arm
+                        if (elapsedTime.seconds() < 1) { //Give 1 second to lowering the servos
+                            robot.grip(Robot.GRIPPER_STATES.GRIPPER_FULL_GRIP);
+                            robot.rightJewelServo.setPosition(robot.RIGHT_PUSH_POSITION);
+                        } else {
+                            colorIsRed = robot.leftColorRed();
+                            knockJewelStep++;
+                        }
+                        break;
+                    case 1: //Detect and turn based on color
+                        if (colorIsRed) {
+                            switch (driveJewelStep) {
+                                case 0:
+                                    if (testNavigator.currentHeading() < -15) {
+                                        robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
+                                        driveJewelStep++;
+                                    } else {
+                                        testNavigator.moveWithAngle(0, -15);
+                                    }
+                                    break;
+                                case 1:
+                                    if (testNavigator.currentHeading() > 0) {
+                                        knockJewelStep++;
+                                    } else {
+                                        testNavigator.moveWithAngle(0, 0);
+                                    }
+                                    break;
+                            }
+                        } else {
+                            switch (driveJewelStep) {
+                                case 0:
+                                    if (testNavigator.currentHeading() > 15) {
+                                        robot.rightJewelServo.setPosition(robot.RIGHT_RELEASE_POSITION);
+                                        driveJewelStep++;
+                                    } else {
+                                        testNavigator.moveWithAngle(0, 15);
+                                    }
+                                    break;
+                                case 1:
+                                    if (testNavigator.currentHeading() < 0) {
+                                        knockJewelStep++;
+                                    } else {
+                                        testNavigator.moveWithAngle(0, 0);
+                                    }
+                                    break;
+                            }
+                        }
+                        break;
+                    case 2:
+                        mainProgramStep++;
+                        break;
                 }
                 break;
             case 1:
                 if (testNavigator.navigationType() == 6) {
                     vuMark = RelicRecoveryVuMark.from(relicTemplate);
                     encoderPositonReference = robot.leftMotor.getCurrentPosition();
+                    elapsedTime.reset();
                     mainProgramStep++;
                 } else {
                     testNavigator.loopNavigation();
@@ -136,7 +161,7 @@ public class IterativeVuforia extends OpMode {
             case 2:
                 switch (vuMark) {
                     case UNKNOWN:
-                        if (elapsedTime.seconds() > 4) {//Do whatever you want to do until you have reached 'false'
+                        if (elapsedTime.seconds() > 4) {
                             if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
                                 break;
                             } else {
@@ -183,6 +208,7 @@ public class IterativeVuforia extends OpMode {
                 testNavigator.loopNavigation();
                 break;
         }
+
     }
 
 
